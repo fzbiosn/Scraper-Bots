@@ -46,42 +46,35 @@ def scroll_down(browser,locator,wait_time=2):
 def core(url):
     browser = init_webdriver()
     login(browser, url)
-    
+    # wait expected conditions
     time.sleep(10)
     
-    html = browser.find_element(By.TAG_NAME, 'html')
-    html.send_keys(Keys.END)
-    
-    time.sleep(2)
-    comments = browser.find_elements(By.ID, "comment")
-
-    
-    # captura informacoes
+    # renderized page   
     comments_data = list()
-    # d_comment = dict.fromkeys(["author", "date", "text", "likes"])
-
-
-
-    while comments != '' and comments != None:
-        d_comment = dict.fromkeys(["author", "date", "text", "likes"])
-        for items in comments:
-            try:
-                comment = items.text
-                comment = comment.split('\n')
-                d_comment["author"] = comment[0]
-                d_comment["date"] = comment[1]
-                d_comment["text"] = comment[2]
-                d_comment["likes"] = comment[3]
-                comments_data.append(d_comment)
-
-                with open('./resources/comments_data.json', 'w', encoding='utf-8') as file:
-                    file.write(json.dumps(comments_data, ensure_ascii=False).encode('utf-8').decode())
-            except:
-                pass
+    for n in range(10):
         html = browser.find_element(By.TAG_NAME, 'html')
         html.send_keys(Keys.END)
-        time.sleep(2)
-        comments = browser.find_elements(By.ID, "comment")
+        time.sleep(4)
 
+    # get comments
+    comments = browser.find_elements(By.CLASS_NAME, "style-scope ytd-item-section-renderer")
+    items = comments[0]
+    comments = items.text
+    comments = comments.split('\n@')
+    for item in comments:
+        try:
+            comment = item.split('\n')
+            d_comment = dict.fromkeys(["author", "date", "text", "likes"])
+            d_comment["author"] = comment[0]
+            d_comment["date"] = comment[1]
+            d_comment["text"] = comment[2]
+            d_comment["likes"] = comment[3]
+            comments_data.append(d_comment)
+        except:
+            pass    
+    # insert comments in json        
     with open('./resources/comments_data.json', 'w', encoding='utf-8') as file:
         file.write(json.dumps(comments_data, ensure_ascii=False).encode('utf-8').decode())
+
+    
+    print(comments_data)

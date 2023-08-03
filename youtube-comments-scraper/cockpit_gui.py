@@ -22,6 +22,7 @@ def start():
     new_window.geometry("350x150")
 
     URL = user_entry.get()
+    print(URL)
     URL = "https://www.youtube.com/watch?v=yNHlbk4IX6A"
 
 
